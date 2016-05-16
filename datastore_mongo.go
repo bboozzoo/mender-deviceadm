@@ -77,3 +77,32 @@ func (db *DataStoreMongo) GetDevice(id DeviceID) (*Device, error) {
 
 	return &res, nil
 }
+
+func (db *DataStoreMongo) PutDevice(dev *Device) error {
+	s := db.session.Copy()
+	defer s.Close()
+	c := s.DB(DbName).C(DbDevicesColl)
+
+	filter := bson.M{"id": dev.ID}
+	updates := map[string]interface{}{}
+	if dev.Status != "" {
+		updates["status"] = dev.Status
+	}
+	if dev.Key != "" {
+		updates["key"] = dev.Key
+	}
+	if dev.DeviceIdentity != "" {
+		updates["device_identity"] = dev.DeviceIdentity
+	}
+	// TODO: should attributes be merged?
+	if len(dev.Attributes) != 0 {
+		updates["attributes"] = dev.Attributes
+	}
+
+	data := bson.M{"$set": updates}
+	_, err := c.Upsert(filter, data)
+	if err != nil {
+		return errors.Wrap(err, "failed to store device")
+	}
+	return nil
+}
