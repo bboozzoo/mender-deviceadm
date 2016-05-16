@@ -128,6 +128,15 @@ func (d *DevAdmHandlers) GetDevice(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func (d *DevAdmHandlers) UpdateDevice(w rest.ResponseWriter, r *rest.Request) {
+	devid := r.PathParam("id")
+
+	dev := Device{}
+
+	err := d.DevAdm.UpdateDevice(DeviceID(devid), &dev)
+	if err != nil {
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (d *DevAdmHandlers) GetDeviceStatus(w rest.ResponseWriter, r *rest.Request) {
