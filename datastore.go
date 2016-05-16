@@ -28,4 +28,6 @@ type DataStore interface {
 	// find a device with given `id`, returns the device or nil,
 	// if device was not found, error is set to ErrDevNotFound
 	GetDevice(id DeviceID) (*Device, error)
+	// update device information
+	PutDevice(dev *Device) error
 }
